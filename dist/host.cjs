@@ -18,9 +18,10 @@ const run = (backendName, worldJS, size) => new Promise(async (resolve) => {
     // }
     const backend = {
         name: backendName,
-        queue: [],
+        //   queue: [],
         handlers: {},
     };
+    const queue = [];
     // instances[doc.ptr] = backend;
     backend.worker = new Worker(backendName, { type: "module" });
     const lengthBuffer = new SharedArrayBuffer(4);
@@ -53,11 +54,20 @@ const run = (backendName, worldJS, size) => new Promise(async (resolve) => {
     };
     backend.on = (type, handler) => (backend.handlers[type] = handler);
     let queuePromiseRes = null;
+    Object.defineProperty(backend, "queuePromiseRes", {
+        get: () => queuePromiseRes,
+    });
+    Object.defineProperty(backend, "pushJS", {
+        value: (...args) => {
+            for (const arg of args)
+                queue.push(arg);
+        },
+    });
     backend.on("wait", async () => {
-        if (backend.queue.length === 0)
+        if (queue.length === 0)
             await new Promise((res) => (queuePromiseRes = res));
         queuePromiseRes = null;
-        backend.send({ type: "eval", js: backend.queue.pop() });
+        backend.send({ type: "eval", js: queue.pop() });
     });
     Object.freeze(backend);
     resolve(backend);

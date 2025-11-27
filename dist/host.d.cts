@@ -6,4 +6,6 @@ export interface Backend {
     name: string;
     worker: Worker;
     send(val: any): any;
+    readonly queuePromiseRes: null | (() => void);
+    pushJS(...args: string[]): any;
 }

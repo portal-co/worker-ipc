@@ -19,9 +19,11 @@ export const run = (backendName: string, worldJS: string, size: number) =>
 
     const backend: any = {
       name: backendName,
-      queue: [],
+      //   queue: [],
       handlers: {},
     };
+
+    const queue = [];
 
     // instances[doc.ptr] = backend;
 
@@ -68,12 +70,20 @@ export const run = (backendName: string, worldJS: string, size: number) =>
       (backend.handlers[type] = handler);
 
     let queuePromiseRes = null;
+    Object.defineProperty(backend, "queuePromiseRes", {
+      get: () => queuePromiseRes,
+    });
+    Object.defineProperty(backend, "pushJS", {
+      value: (...args: string[]) => {
+        for (const arg of args) queue.push(arg);
+      },
+    });
     backend.on("wait", async () => {
-      if (backend.queue.length === 0)
+      if (queue.length === 0)
         await new Promise((res) => (queuePromiseRes = res));
       queuePromiseRes = null;
 
-      backend.send({ type: "eval", js: backend.queue.pop() });
+      backend.send({ type: "eval", js: queue.pop() });
     });
     Object.freeze(backend);
     resolve(backend);
@@ -82,5 +92,7 @@ export interface Backend {
   handlers: { [a: string]: (v: any) => void };
   name: string;
   worker: Worker;
-  send(val: any)
+  send(val: any);
+  readonly queuePromiseRes: null | (() => void);
+  pushJS(...args: string[]);
 }
