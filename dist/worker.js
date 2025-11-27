@@ -39,7 +39,7 @@ export const start = async () => {
                 const str = decode(slice(decodeBuffer, 0, length));
                 const reply = parse(str);
                 if (reply.type === "eval") {
-                    ev(reply);
+                    ev(reply.js);
                 }
                 return reply;
             },
@@ -56,7 +56,7 @@ export const start = async () => {
                     }
                     const reply = parse(decode(slice(decodeBuffer, 0, length)));
                     if (reply.type === "eval") {
-                        ev(reply);
+                        ev(reply.js);
                     }
                     res(reply);
                 });
