@@ -22,9 +22,9 @@ const ev = globalThis.eval.bind(globalThis);
 const parse = JSON.parse.bind(JSON);
 const { store, load, wait, waitAsync } = Atomics;
 const _Promise = Promise;
-export const start = async () => {
+export const start = async ({ name = "__worker_ipc", } = {}) => {
     //   const evalQueue = (globalThis as any).evalQueue = [] as any[];
-    Object.defineProperty(globalThis, "ipc", {
+    Object.defineProperty(globalThis, name, {
         value: Object.freeze({
             send: (msg) => {
                 // console.log('worker send', msg);

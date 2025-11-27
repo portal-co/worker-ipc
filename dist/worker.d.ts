@@ -1,1 +1,3 @@
-export declare const start: () => Promise<void>;
+export declare const start: ({ name, }?: {
+    name?: string;
+}) => Promise<void>;
