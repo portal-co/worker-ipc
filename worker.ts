@@ -65,7 +65,7 @@ export const start = async () => {
         store(lengthTyped, 0, 0);
 
         // self.postMessage(JSON.parse(JSON.stringify(msg)));
-        self.postMessage(msg);
+        pm(msg);
 
         return new _Promise(async (res) => {
           await waitAsync(lengthTyped, 0, 0, Infinity).value; // wait until typed[0] != 0
