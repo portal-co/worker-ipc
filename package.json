@@ -1,1 +1,33 @@
-{"name":"@portal-solutipns/worket-ipc","devDependencies":{"typescript":"^5.9.3","zshy":"^0.6.0"}}
+{
+  "name": "@portal-solutipns/worket-ipc",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "zshy": "^0.6.0"
+  },
+  "type": "module",
+  "license": "MIT",
+  "zshy": {
+    "exports": {
+      "./host": "host.ts",
+      "./worker": "worker.ts"
+    }
+  },
+  "scripts": {
+    "build": "npx zshy"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./host": {
+      "types": "./dist/host.d.cts",
+      "import": "./dist/host.js",
+      "require": "./dist/host.cjs"
+    },
+    "./worker": {
+      "types": "./dist/worker.d.cts",
+      "import": "./dist/worker.js",
+      "require": "./dist/worker.cjs"
+    }
+  }
+}
