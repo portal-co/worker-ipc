@@ -1,5 +1,5 @@
-export const run = (backendName: string, worldJS: string,size: number) =>
-  new Promise(async (resolve) => {
+export const run = (backendName: string, worldJS: string, size: number) =>
+  new Promise<Backend>(async (resolve) => {
     if (backendName === null) return resolve(null);
 
     //   if (window.crossOriginIsolated === false) {
@@ -78,3 +78,8 @@ export const run = (backendName: string, worldJS: string,size: number) =>
     Object.freeze(backend);
     resolve(backend);
   });
+export interface Backend {
+  handlers: { [a: string]: (v: any) => Promise<any> | any };
+  name: string;
+  worker: Worker;
+}
