@@ -37,8 +37,7 @@ export const run = (backendName, worldJS, size) => new Promise(async (resolve) =
         else
             backend.send({});
     };
-    backend.send = (msg) => {
-        // if (msg.type) console.log('main send', msg);
+    backend.sendCore = (msg) => {
         // const encodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
         const json = JSON.stringify(msg);
         // encoder.encodeInto(json, encodeBuffer);
@@ -48,6 +47,18 @@ export const run = (backendName, worldJS, size) => new Promise(async (resolve) =
         }
         Atomics.store(lengthTyped, 0, encodeBuffer.length);
         Atomics.notify(lengthTyped, 0);
+    };
+    backend.send = async (msg) => {
+        const id = Math.random().toString(36).substring(2, 15);
+        if (typeof msg === 'object')
+            msg = { ...msg, id };
+        backend.sendCore(msg);
+        return await new Promise(res => {
+            backend.on(id, (msg) => {
+                delete backend.handlers[id];
+                res(msg);
+            });
+        });
     };
     backend.on = (type, handler) => (backend.handlers[type] = handler);
     let queuePromiseRes = null;

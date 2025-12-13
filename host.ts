@@ -47,9 +47,7 @@ export const run = (backendName: string, worldJS: string, size: number) =>
         backend.handlers[msg.type](msg);
       } else backend.send({});
     };
-
-    backend.send = (msg: any) => {
-      // if (msg.type) console.log('main send', msg);
+    backend.sendCore = (msg: any) => {       // if (msg.type) console.log('main send', msg);
 
       // const encodeBuffer = new Uint8Array(SERIAL_RES_SIZE);
 
@@ -64,6 +62,17 @@ export const run = (backendName: string, worldJS: string, size: number) =>
 
       Atomics.store(lengthTyped, 0, encodeBuffer.length);
       Atomics.notify(lengthTyped, 0);
+    };
+    backend.send = async (msg: any) => {
+      const id = Math.random().toString(36).substring(2, 15);
+      if (typeof msg === 'object') msg = { ...msg, id };
+      backend.sendCore(msg);
+      return await new Promise(res => {
+        backend.on(id, (msg: any) => {
+          delete backend.handlers[id];
+          res(msg);
+        });
+      });
     };
 
     backend.on = (type: string, handler: any) =>
@@ -92,7 +101,8 @@ export interface Backend {
   handlers: { [a: string]: (v: any) => void };
   name: string;
   worker: Worker;
-  send(val: any);
+  sendCore(val: any);
+  send(val: any): Promise<MessageEvent>;
   readonly queuePromiseRes: null | (() => void);
   pushJS(...args: string[]);
 }
