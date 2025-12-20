@@ -17,6 +17,7 @@ export const run = (backendName: string, worldJS: string, size: number) =>
     //   backend.worker.terminate();
     // }
 
+    const replyHandlers = { __proto__: null } as { [key: string]: (msg: any) => void };
     const backend: any = {
       name: backendName,
       //   queue: [],
@@ -43,7 +44,10 @@ export const run = (backendName: string, worldJS: string, size: number) =>
     backend.worker.onmessage = (e: MessageEvent) => {
       const msg = e.data;
       // if (msg.type !== 'wait') console.log('main recv', msg);
-      if (backend.handlers[msg.type]) {
+      if (replyHandlers[msg.type]) {
+        replyHandlers[msg.type](msg);
+        delete replyHandlers[msg.type];
+      } else if (backend.handlers[msg.type]) {
         backend.handlers[msg.type](msg);
       } else backend.send({});
     };
@@ -68,10 +72,7 @@ export const run = (backendName: string, worldJS: string, size: number) =>
       if (typeof msg === 'object') msg = { ...msg, id };
       backend.sendCore(msg);
       return await new Promise(res => {
-        backend.on(id, (msg: any) => {
-          delete backend.handlers[id];
-          res(msg);
-        });
+        replyHandlers[id] = res;
       });
     };
 
