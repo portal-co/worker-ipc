@@ -1,13 +1,14 @@
-# @portal-solutipns/worket-ipc
+# @portal-solutions/worker-ipc
 
 ## Description
-Project worker-ipc
+IPC (Inter-Process Communication) library for Workers (`host.ts`, `worker.ts`).
 
 ## Goals
-- [ ] Add project goals
+- [ ] Facilitate Host-Worker communication
+- [ ] Provide typed IPC
 
 ## Progress
-- [ ] Initial setup
+- [ ] Package setup
 
 ---
 *AI assisted*
